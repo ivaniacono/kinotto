@@ -16,4 +16,4 @@ killall dhclient 2>/dev/null
 sleep 1
 
 wpa_supplicant -i "$IFACE" -C "$CTRL_IFACE_DIR" -B -c "$WPA_SUPPLICANT_CONF"
-dhclient "$IFACE"
+dhclient -nw "$IFACE"
