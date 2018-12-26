@@ -27,7 +27,7 @@ Currently offers the following functionalities:
 ## Usage
 Build the library:
 
-`$ make`.
+`$ make`
 
 Then install it:
 

@@ -37,9 +37,9 @@ static void print_help(const char *name)
 	fprintf(stderr, " '''''                                     \n");
 	fprintf(stderr, "Usage: %s -i INTERFACE [OPTION]... [COMMAND]\n", name);
 	fprintf(stderr, "\n");
-	fprintf(stderr, " ip                      (default option)\n");
+	fprintf(stderr, " ip                      (default command)\n");
 	fprintf(stderr, " scan                    scan networks\n");
-	fprintf(stderr, " info                    get current interface state");
+	fprintf(stderr, " info                    get current interface state\n");
 	fprintf(stderr, " connect 'SSID' 'PSK'    connect to a network\n");
 	fprintf(stderr,
 		" sta_info                get current Wi-Fi interface state\n");
