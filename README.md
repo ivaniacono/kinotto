@@ -53,7 +53,7 @@ NOTE: if you're running network-manager you will probably need to stop / disable
 
 A simple script that automates stopping network-manager and starting WPA supplicant is provided under the same folder. WPA supplicant is required if managing a Wi-Fi network is desired.
 
-`# start_wpa_supplicant.sh wlan0`
+`# ./start_wpa_supplicant.sh wlan0`
 
 Running `./kinottocli` without arguments will print the help.
 
