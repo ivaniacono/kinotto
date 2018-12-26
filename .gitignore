@@ -1,0 +1,8 @@
+*.o
+*.out
+*.a
+*.so
+kinotto
+deps
+.vscode
+kinottocli
