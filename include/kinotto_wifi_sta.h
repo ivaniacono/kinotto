@@ -10,7 +10,7 @@ extern "C" {
 
 #define KINOTTO_WIFI_STA_CONNECT_TIMEOUT_S 10
 
-kinotto_wifi_sta_t *kinotto_wifi_sta_init(const char *ctrl_path);
+kinotto_wifi_sta_t *kinotto_wifi_sta_init(const char *ifname);
 
 void kinotto_wifi_sta_destroy(kinotto_wifi_sta_t *kinotto_wifi_sta);
 
