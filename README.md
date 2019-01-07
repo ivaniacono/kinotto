@@ -13,7 +13,7 @@
 
 Kinotto is a library designed to simplify writing custom network configuration tools which can speed up the development of *nix based embedded systems.
 
-__This is very much a work in progress therefore not production ready.__
+__This is very much a work in progress.__
 
 Its API and design is also very luckily to change.
 
