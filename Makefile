@@ -1,4 +1,5 @@
-INSTALL_DIR ?= /usr/local/lib
+OBJ_INSTALL_DIR ?= /usr/local/lib
+HEADERS_INSTALL_DIR ?= /usr/local/include/kinotto
 
 WPA_SUPPLICANT := ./wpa_supplicant
 
@@ -26,9 +27,13 @@ WPA_OBJ_FILES := $(patsubst $(WPA_SUPPLICANT)/%.c,%.o,$(WPA_C_FILES))
 
 CC ?= gcc
 
-.PHONY = libkinotto.so libkinotto.a install clean
+.PHONY = doc libkinotto.so libkinotto.a install clean
 
 all: libkinotto.so libkinotto.a
+
+doc:
+	rm -rf docs
+	doxygen Doxyfile
 
 libkinotto.so: $(OBJ_FILES) $(WPA_OBJ_FILES)
 	$(CC) -shared -o $@ $^ $(LDFLAGS)
@@ -46,8 +51,11 @@ wpa_ctrl.o: $(WPA_SUPPLICANT)/wpa_ctrl.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 install:
-	@install -m 644 libkinotto.so $(INSTALL_DIR)
-	@ldconfig
+	install -m 644 libkinotto.so $(OBJ_INSTALL_DIR)
+	ldconfig
+	install -m 755 -d $(HEADERS_INSTALL_DIR)
+	install -m 644 include/*.h $(HEADERS_INSTALL_DIR)
 
 clean:
-	@rm -f *.a *.so *.o
+	rm -f *.a *.so *.o
+	rm -rf docs

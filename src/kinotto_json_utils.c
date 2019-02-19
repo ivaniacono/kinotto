@@ -117,7 +117,7 @@ error:
 }
 
 int kinotto_wifi_sta_scan_result_json(
-    struct kinotto_wifi_sta_scan_result *scan_res, int scan_size, char *buf,
+    struct kinotto_wifi_sta_detail *scan_res, int scan_size, char *buf,
     int buf_size)
 {
 	int i;

@@ -51,15 +51,15 @@ int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
 
 int kinotto_wifi_sta_connect_network(
     kinotto_wifi_sta_t *kinotto_wifi_sta,
-    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info, char *ssid, int ssid_len,
-    char *psk, int psk_len, int timeout)
+    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
+	kinotto_wifi_sta_connect_t *kinotto_wifi_sta_connect)
 {
-	if (timeout < 0)
+	if (kinotto_wifi_sta_connect->timeout < 0)
 		return -1;
 
 	if (kinotto_wpa_ctrl_wrapper_connect_network(
-		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper, ssid, ssid_len, psk,
-		psk_len))
+		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper,
+		kinotto_wifi_sta_connect, kinotto_wifi_sta_connect->remove_all))
 		goto error_wpa_ctrl_wrapper;
 
 	do {
@@ -68,7 +68,7 @@ int kinotto_wifi_sta_connect_network(
 			kinotto_wifi_sta_info))
 			goto error_wpa_ctrl_wrapper;
 		sleep(1);
-	} while ((--timeout) &&
+	} while ((--kinotto_wifi_sta_connect->timeout) &&
 		 (kinotto_wifi_sta_info->state != KINOTTO_WIFI_STA_CONNECTED));
 
 	if (kinotto_wifi_sta_info->state != KINOTTO_WIFI_STA_CONNECTED) {
@@ -87,7 +87,7 @@ error_connect_timeout:
 }
 
 int kinotto_wifi_sta_scan_networks(kinotto_wifi_sta_t *kinotto_wifi_sta,
-				   kinotto_wifi_sta_scan_result_t *buf,
+				   kinotto_wifi_sta_detail_t *buf,
 				   int buf_size)
 {
 	int ret;

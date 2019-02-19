@@ -25,14 +25,13 @@ struct kinotto_wpa_ctrl_wrapper {
 };
 
 static int kinotto_wpa_ctrl_wrapper_cmd(struct wpa_ctrl *ctrl_conn,
-					const char *cmd, char *buf,
-					size_t buf_size, int print);
+					const char *cmd, char *buf, size_t buf_size);
 static int kinotto_wpa_ctrl_wrapper_parse_security(const char *flags, int len,
 						   char *buf);
 static int kinotto_wpa_ctrl_wrapper_ssid_is_hidden(const char *ssid, int len);
 static int
 kinotto_wpa_ctrl_wrapper_parse_bss(const char *scan_result, int result_size,
-				   struct kinotto_wifi_sta_scan_result *buf);
+				   struct kinotto_wifi_sta_detail *buf);
 
 static int
 kinotto_wpa_ctrl_wrapper_parse_wpa_state(const char *wpa_state, int len,
@@ -96,8 +95,7 @@ void kinotto_wpa_ctrl_wrapper_destroy(
 }
 
 static int kinotto_wpa_ctrl_wrapper_cmd(struct wpa_ctrl *ctrl_conn,
-					const char *cmd, char *buf,
-					size_t buf_size, int print)
+					const char *cmd, char *buf, size_t buf_size)
 {
 	int ret;
 
@@ -118,9 +116,6 @@ static int kinotto_wpa_ctrl_wrapper_cmd(struct wpa_ctrl *ctrl_conn,
 
 	buf[buf_size - 1] = '\0';
 
-	if (print)
-		printf("%s\n", buf);
-
 	return 0;
 
 error:
@@ -136,7 +131,7 @@ int kinotto_wpa_ctrl_wrapper_disconnect_network(
 	buf_size = sizeof(buf);
 
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 "DISCONNECT", buf, buf_size, 0))
+					 "DISCONNECT", buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	return 0;
@@ -146,63 +141,62 @@ error_wpa_ctrl_wrapper:
 }
 
 int kinotto_wpa_ctrl_wrapper_connect_network(
-    kinotto_wpa_ctrl_wrapper_t *kinotto_wpa_ctrl_wrapper, char *ssid,
-    int ssid_len, char *psk, int psk_len)
+    kinotto_wpa_ctrl_wrapper_t *kinotto_wpa_ctrl_wrapper,
+	kinotto_wifi_sta_connect_t *kinotto_wifi_sta_connect, int remove_all)
 {
 	char buf[512] = {0};
 	int buf_size = sizeof(buf);
 	int network_id = 0;
 	char cmd[WPA_CTRL_CMD_SIZE] = {0};
 
-	if ((strlen(ssid) > ssid_len) || (ssid_len > KINOTTO_WIFI_STA_SSID_LEN))
+	if (strlen(kinotto_wifi_sta_connect->ssid) > KINOTTO_WIFI_STA_SSID_LEN)
 		goto error_ssid;
 
-	if ((strlen(psk) > psk_len) || (psk_len > KINOTTO_WIFI_STA_PSK_LEN))
+	if (strlen(kinotto_wifi_sta_connect->psk) > KINOTTO_WIFI_STA_PSK_LEN)
 		goto error_psk;
 
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 "DISCONNECT", buf, buf_size, 0))
+					 "DISCONNECT", buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
-	// if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-	// 				 "REMOVE_NETWORK all", buf, buf_size,
-	// 				 0))
-	// 	goto error_wpa_ctrl_wrapper;
+	if (remove_all) {
+		if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
+						 "REMOVE_NETWORK all", buf, buf_size))
+			goto error_wpa_ctrl_wrapper;
+	}
 
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 "ADD_NETWORK", buf, buf_size, 0))
+					 "ADD_NETWORK", buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	network_id = atoi(buf);
-	// if (network_id)
-	// 	goto error_wpa_ctrl_wrapper;
 
 	snprintf(cmd, WPA_CTRL_CMD_SIZE, "SET_NETWORK %d ssid \"%s\"",
-		network_id, ssid);
+		network_id, kinotto_wifi_sta_connect->ssid);
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 cmd, buf, buf_size, 0))
+					 cmd, buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	memset(cmd, 0, 128);
-	if (!strlen(psk)) {
+	if (!strlen(kinotto_wifi_sta_connect->psk)) {
 		snprintf(cmd, WPA_CTRL_CMD_SIZE, "SET_NETWORK %d key_mgmt NONE",
 			 network_id);
 	} else {
 		snprintf(cmd, WPA_CTRL_CMD_SIZE, "SET_NETWORK %d psk \"%s\"",
-			 network_id, psk);
+			 network_id, kinotto_wifi_sta_connect->psk);
 	}
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 cmd, buf, buf_size, 0))
+					 cmd, buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	memset(cmd, 0, 128);
 	snprintf(cmd, WPA_CTRL_CMD_SIZE, "ENABLE_NETWORK %d", network_id);
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 cmd, buf, buf_size, 0))
+					 cmd, buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 "RECONNECT", buf, buf_size, 0))
+					 "RECONNECT", buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	return 0;
@@ -227,7 +221,7 @@ int kinotto_wpa_ctrl_wrapper_status(
 	int buf_size = sizeof(buf);
 
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 "STATUS", buf, buf_size, 0))
+					 "STATUS", buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	if (kinotto_wpa_ctrl_wrapper_parse_status(buf, buf_size, sta_info))
@@ -287,7 +281,7 @@ static int kinotto_wpa_ctrl_wrapper_ssid_is_hidden(const char *ssid, int len)
 
 static int
 kinotto_wpa_ctrl_wrapper_parse_bss(const char *scan_result, int result_size,
-				   struct kinotto_wifi_sta_scan_result *buf)
+				   struct kinotto_wifi_sta_detail *buf)
 {
 	char *left;
 	char *right;
@@ -447,7 +441,7 @@ error:
 
 int kinotto_wpa_ctrl_wrapper_scan_networks(
     kinotto_wpa_ctrl_wrapper_t *kinotto_wpa_ctrl_wrapper,
-    struct kinotto_wifi_sta_scan_result *result_buf, int result_buf_size)
+    struct kinotto_wifi_sta_detail *result_buf, int result_buf_size)
 {
 	char buf[2048];
 	int buf_size;
@@ -462,7 +456,7 @@ int kinotto_wpa_ctrl_wrapper_scan_networks(
 	do {
 		if (kinotto_wpa_ctrl_wrapper_cmd(
 			kinotto_wpa_ctrl_wrapper->ctrl_conn, "SCAN", buf,
-			buf_size, 0))
+			buf_size))
 			goto error;
 
 		sleep(1);
@@ -476,7 +470,7 @@ int kinotto_wpa_ctrl_wrapper_scan_networks(
 		snprintf(cmd_bss_n, 8, "BSS %d", i);
 		if (kinotto_wpa_ctrl_wrapper_cmd(
 			kinotto_wpa_ctrl_wrapper->ctrl_conn, cmd_bss_n, buf,
-			buf_size, 0))
+			buf_size))
 			goto error;
 
 		if (kinotto_wpa_ctrl_wrapper_parse_bss(buf, buf_size,
@@ -492,7 +486,7 @@ error:
 	return -1;
 
 error_small_buffer:
-	fprintf(stderr, "Buffer for kinotto_wifi_sta_scan_result "
+	fprintf(stderr, "Buffer for kinotto_wifi_sta_detail "
 			"is too small.\n");
 	return -1;
 }
@@ -504,7 +498,7 @@ int kinotto_wpa_ctrl_wrapper_save_config(
 	int buf_size = sizeof(buf);
 
 	if (kinotto_wpa_ctrl_wrapper_cmd(kinotto_wpa_ctrl_wrapper->ctrl_conn,
-					 "SAVE_CONFIG", buf, buf_size, 0))
+					 "SAVE_CONFIG", buf, buf_size))
 		goto error_wpa_ctrl_wrapper;
 
 	return 0;

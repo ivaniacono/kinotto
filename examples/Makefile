@@ -4,10 +4,9 @@ INSTALL_DIR ?= /usr/local/bin
 LDFLAGS += -lkinotto
 
 # Static
-# LDFLAGS += \
-# 	../libkinotto.a
+# LDFLAGS += libkinotto.a
 
-CFLAGS += -I../include -Wall
+CFLAGS += -Wall
 
 C_FILES := $(wildcard *.c)
 OBJ_FILES := $(patsubst %.c, %.o,$(C_FILES))
@@ -25,7 +24,7 @@ kinottocli: $(OBJ_FILES)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 install:
-	@install -m 755 kinottocli $(INSTALL_DIR)
+	install -m 755 kinottocli $(INSTALL_DIR)
 
 clean:
-	@rm -f *.o kinottocli
+	rm -f *.o kinottocli

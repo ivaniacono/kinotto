@@ -1,6 +1,7 @@
-#include "kinotto_ip_utils.h"
-#include "kinotto_wifi_sta.h"
-#include "kinotto_json_utils.h"
+#include <kinotto/kinotto_ip_utils.h>
+#include <kinotto/kinotto_wifi_sta.h>
+#include <kinotto/kinotto_json_utils.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,6 +9,7 @@
 #define JSON_RES_BUF_SIZE 144 * 1024
 #define DEFAULT_WIFI_CLI_IF "wlan0"
 #define DHCP_TIMEOUT_S 30
+#define WIFI_STA_CONNECT_TIMEOUT_S 10
 
 enum cmd { IP_ONLY, IP_INFO, WIFI_SCAN, WIFI_CLI, WIFI_INFO };
 
@@ -19,11 +21,10 @@ struct kinottocli_args {
 	int quiet_psk;
 	char ifname[KINOTTO_IFSIZE];
 	kinotto_addr_t addr;
-	char cli_ssid[KINOTTO_WIFI_STA_SSID_LEN];
-	char cli_psk[KINOTTO_WIFI_STA_PSK_LEN];
+	kinotto_wifi_sta_connect_t sta_connect;
 };
 
-struct kinottocli_args cli_args = {0, 0, 1, 0, 0, {0}, {{0}, {0}}, {0}, {0}};
+struct kinottocli_args cli_args = {0, 0, 1, 0, 0, {0}, {{0}, {0}}, {{0}, {0}, 0, 0}};
 
 static void print_help(const char *name)
 {
@@ -37,9 +38,9 @@ static void print_help(const char *name)
 	fprintf(stderr, " '''''                                     \n");
 	fprintf(stderr, "Usage: %s -i INTERFACE [OPTION]... [COMMAND]\n", name);
 	fprintf(stderr, "\n");
-	fprintf(stderr, " ip                      (default command)\n");
+	fprintf(stderr, " ip                      assign an IP address\n");
 	fprintf(stderr, " scan                    scan networks\n");
-	fprintf(stderr, " info                    get current interface state\n");
+	fprintf(stderr, " info                    get current interface state (default command)\n");
 	fprintf(stderr, " connect 'SSID' 'PSK'    connect to a network\n");
 	fprintf(stderr,
 		" sta_info                get current Wi-Fi interface state\n");
@@ -54,7 +55,7 @@ static void print_help(const char *name)
 	fprintf(stderr, "  -j       output as JSON\n");
 }
 
-static void print_scan_result(kinotto_wifi_sta_scan_result_t *scan_result,
+static void print_scan_result(kinotto_wifi_sta_detail_t *scan_result,
 			      size_t size)
 {
 	int i = 0;
@@ -86,7 +87,7 @@ static void print_scan_result(kinotto_wifi_sta_scan_result_t *scan_result,
 	printf("╝\n");
 }
 
-static void print_scan_result_json(kinotto_wifi_sta_scan_result_t *scan_result,
+static void print_scan_result_json(kinotto_wifi_sta_detail_t *scan_result,
 				   int networks)
 {
 	char json_res[JSON_RES_BUF_SIZE];
@@ -190,24 +191,24 @@ static int parse_args(int argc, char *argv[])
 		} else if (!strncmp(argv[optind], "connect", 7)) {
 			cli_args.cmd = WIFI_CLI;
 			if ((optind + 1) < argc) {
-				strncpy(cli_args.cli_ssid, argv[optind + 1],
+				strncpy(cli_args.sta_connect.ssid, argv[optind + 1],
 					KINOTTO_WIFI_STA_SSID_LEN);
 			}
 			if ((optind + 2) < argc) {
-				strncpy(cli_args.cli_psk, argv[optind + 2],
+				strncpy(cli_args.sta_connect.psk, argv[optind + 2],
 					KINOTTO_WIFI_STA_PSK_LEN);
 			} else {
 				if (cli_args.quiet_psk) {
 					qpsk = getpass("PSK: ");
 					if (qpsk) {
 						strncpy(
-						    cli_args.cli_psk, qpsk,
+						    cli_args.sta_connect.psk, qpsk,
 						    KINOTTO_WIFI_STA_PSK_LEN);
 					} else {
 						goto error;
 					}
 				} else {
-					memset(cli_args.cli_psk, '\0',
+					memset(cli_args.sta_connect.psk, '\0',
 					       KINOTTO_WIFI_STA_PSK_LEN);
 				}
 			}
@@ -218,8 +219,10 @@ static int parse_args(int argc, char *argv[])
 		} else if (!strncmp(argv[optind], "ip", 2)) {
 			cli_args.cmd = IP_ONLY;
 		} else {
-			cli_args.cmd = IP_ONLY;
+			cli_args.cmd = IP_INFO;
 		}
+	} else {
+		cli_args.cmd = IP_INFO;
 	}
 
 	return 0;
@@ -232,7 +235,7 @@ static int exec_wifi_scan()
 {
 	int networks = 0;
 	kinotto_wifi_sta_t *kinotto_wifi_sta;
-	kinotto_wifi_sta_scan_result_t scan_result[1024];
+	kinotto_wifi_sta_detail_t scan_result[1024];
 
 	kinotto_wifi_sta = kinotto_wifi_sta_init(cli_args.ifname);
 	if (!kinotto_wifi_sta)
@@ -335,11 +338,12 @@ static int exec_wifi_client()
 	if (!kinotto_wifi_sta)
 		return -1;
 
-	printf("Connecting to %s...", cli_args.cli_ssid);
+	cli_args.sta_connect.timeout = WIFI_STA_CONNECT_TIMEOUT_S;
+
+	printf("Connecting to %s...", cli_args.sta_connect.ssid);
 	rc = kinotto_wifi_sta_connect_network(
-	    kinotto_wifi_sta, &kinotto_wifi_sta_info, cli_args.cli_ssid,
-	    KINOTTO_WIFI_STA_SSID_LEN, cli_args.cli_psk,
-	    strlen(cli_args.cli_psk), KINOTTO_WIFI_STA_CONNECT_TIMEOUT_S);
+	    kinotto_wifi_sta, &kinotto_wifi_sta_info,
+		&cli_args.sta_connect);
 
 	if (rc) {
 		printf("failed\n");
