@@ -52,7 +52,7 @@ int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
 int kinotto_wifi_sta_connect_network(
     kinotto_wifi_sta_t *kinotto_wifi_sta,
     kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
-	kinotto_wifi_sta_connect_t *kinotto_wifi_sta_connect)
+    kinotto_wifi_sta_connect_t *kinotto_wifi_sta_connect)
 {
 	if (kinotto_wifi_sta_connect->timeout < 0)
 		return -1;
@@ -86,9 +86,27 @@ error_connect_timeout:
 	return -1;
 }
 
+int kinotto_wifi_sta_disconnect_network(
+    kinotto_wifi_sta_t *kinotto_wifi_sta,
+    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info)
+{
+	if (kinotto_wpa_ctrl_wrapper_disconnect_network(
+		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper))
+		goto error_wpa_ctrl_wrapper;
+
+	if (kinotto_wpa_ctrl_wrapper_status(
+		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper,
+		kinotto_wifi_sta_info))
+		goto error_wpa_ctrl_wrapper;
+
+	return 0;
+
+error_wpa_ctrl_wrapper:
+	return -1;
+}
+
 int kinotto_wifi_sta_scan_networks(kinotto_wifi_sta_t *kinotto_wifi_sta,
-				   kinotto_wifi_sta_detail_t *buf,
-				   int buf_size)
+				   kinotto_wifi_sta_detail_t *buf, int buf_size)
 {
 	int ret;
 	int i = 0;

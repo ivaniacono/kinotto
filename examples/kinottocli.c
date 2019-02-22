@@ -11,7 +11,7 @@
 #define DHCP_TIMEOUT_S 30
 #define WIFI_STA_CONNECT_TIMEOUT_S 10
 
-enum cmd { IP_ONLY, IP_INFO, WIFI_SCAN, WIFI_CLI, WIFI_INFO };
+enum cmd { IP_ONLY, IP_INFO, WIFI_SCAN, WIFI_CLI, WIFI_INFO, WIFI_DISCONNECT };
 
 struct kinottocli_args {
 	int cmd;
@@ -42,6 +42,7 @@ static void print_help(const char *name)
 	fprintf(stderr, " scan                    scan networks\n");
 	fprintf(stderr, " info                    get current interface state (default command)\n");
 	fprintf(stderr, " connect 'SSID' 'PSK'    connect to a network\n");
+	fprintf(stderr, " disconnect              disconnect from network\n");
 	fprintf(stderr,
 		" sta_info                get current Wi-Fi interface state\n");
 	fprintf(stderr, "\n");
@@ -212,6 +213,8 @@ static int parse_args(int argc, char *argv[])
 					       KINOTTO_WIFI_STA_PSK_LEN);
 				}
 			}
+		} else if (!strncmp(argv[optind], "disconnect", 10)) {
+			cli_args.cmd = WIFI_DISCONNECT;
 		} else if (!strncmp(argv[optind], "info", 4)) {
 			cli_args.cmd = IP_INFO;
 		} else if (!strncmp(argv[optind], "sta_info", 8)) {
@@ -373,6 +376,30 @@ error:
 	return -1;
 }
 
+static int exec_wifi_disconnect()
+{
+	int rc = 0;
+	kinotto_wifi_sta_t *kinotto_wifi_sta;
+	kinotto_wifi_sta_info_t kinotto_wifi_sta_info;
+	kinotto_wifi_sta = kinotto_wifi_sta_init(cli_args.ifname);
+	if (!kinotto_wifi_sta)
+		return -1;
+
+	rc = kinotto_wifi_sta_disconnect_network(kinotto_wifi_sta,
+		&kinotto_wifi_sta_info);
+
+	if (rc) {
+		printf("failed\n");
+	}
+	printf("OK\n");
+
+	kinotto_ip_utils_flush_ipv4(cli_args.ifname);
+
+	kinotto_wifi_sta_destroy(kinotto_wifi_sta);
+
+	return 0;
+}
+
 static int exec_cmd()
 {
 	int ret = 0;
@@ -389,6 +416,9 @@ static int exec_cmd()
 		break;
 	case WIFI_CLI:
 		ret = exec_wifi_client();
+		break;
+	case WIFI_DISCONNECT:
+		ret = exec_wifi_disconnect();
 		break;
 	case WIFI_INFO:
 		ret = exec_wifi_info();
