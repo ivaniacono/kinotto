@@ -109,6 +109,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a6bd6e47e70268f1472bd99eae626ac05"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__wifi__sta_8h.html#a6bd6e47e70268f1472bd99eae626ac05">kinotto_wifi_sta_connect_network</a> (<a class="el" href="kinotto__wifi__sta__types_8h.html#ab3a70b8fed53c4c471f9ed7d541753c6">kinotto_wifi_sta_t</a> *<a class="el" href="structkinotto__wifi__sta.html">kinotto_wifi_sta</a>, <a class="el" href="kinotto__wifi__sta__types_8h.html#ade02b0b5a5512f102b8f6d772a868ba2">kinotto_wifi_sta_info_t</a> *<a class="el" href="structkinotto__wifi__sta__info.html">kinotto_wifi_sta_info</a>, <a class="el" href="structkinotto__wifi__sta__connect.html">kinotto_wifi_sta_connect_t</a> *<a class="el" href="structkinotto__wifi__sta__connect.html">kinotto_wifi_sta_connect</a>)</td></tr>
 <tr class="memdesc:a6bd6e47e70268f1472bd99eae626ac05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect to a wifi network.  <a href="#a6bd6e47e70268f1472bd99eae626ac05">More...</a><br /></td></tr>
 <tr class="separator:a6bd6e47e70268f1472bd99eae626ac05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ed7ff663fcab4beb4b54dd37a3427b1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__wifi__sta_8h.html#a8ed7ff663fcab4beb4b54dd37a3427b1">kinotto_wifi_sta_disconnect_network</a> (<a class="el" href="kinotto__wifi__sta__types_8h.html#ab3a70b8fed53c4c471f9ed7d541753c6">kinotto_wifi_sta_t</a> *<a class="el" href="structkinotto__wifi__sta.html">kinotto_wifi_sta</a>, <a class="el" href="kinotto__wifi__sta__types_8h.html#ade02b0b5a5512f102b8f6d772a868ba2">kinotto_wifi_sta_info_t</a> *<a class="el" href="structkinotto__wifi__sta__info.html">kinotto_wifi_sta_info</a>)</td></tr>
+<tr class="memdesc:a8ed7ff663fcab4beb4b54dd37a3427b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnect from a wifi network.  <a href="#a8ed7ff663fcab4beb4b54dd37a3427b1">More...</a><br /></td></tr>
+<tr class="separator:a8ed7ff663fcab4beb4b54dd37a3427b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65846ce9f561a95b5505ada9305408f7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__wifi__sta_8h.html#a65846ce9f561a95b5505ada9305408f7">kinotto_wifi_sta_save_config</a> (<a class="el" href="kinotto__wifi__sta__types_8h.html#ab3a70b8fed53c4c471f9ed7d541753c6">kinotto_wifi_sta_t</a> *<a class="el" href="structkinotto__wifi__sta.html">kinotto_wifi_sta</a>)</td></tr>
 <tr class="memdesc:a65846ce9f561a95b5505ada9305408f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save wifi station network information.  <a href="#a65846ce9f561a95b5505ada9305408f7">More...</a><br /></td></tr>
 <tr class="separator:a65846ce9f561a95b5505ada9305408f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,6 +190,45 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a8ed7ff663fcab4beb4b54dd37a3427b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ed7ff663fcab4beb4b54dd37a3427b1">&#9670;&nbsp;</a></span>kinotto_wifi_sta_disconnect_network()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kinotto_wifi_sta_disconnect_network </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kinotto__wifi__sta__types_8h.html#ab3a70b8fed53c4c471f9ed7d541753c6">kinotto_wifi_sta_t</a> *&#160;</td>
+          <td class="paramname"><em>kinotto_wifi_sta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kinotto__wifi__sta__types_8h.html#ade02b0b5a5512f102b8f6d772a868ba2">kinotto_wifi_sta_info_t</a> *&#160;</td>
+          <td class="paramname"><em>kinotto_wifi_sta_info</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disconnect from a wifi network. </p>
+<p>Disconnect from a wifi station.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> rc = 0;</div><div class="line"><a class="code" href="structkinotto__wifi__sta.html">kinotto_wifi_sta_t</a> *kinotto_wifi_sta;</div><div class="line"><a class="code" href="structkinotto__wifi__sta__info.html">kinotto_wifi_sta_info_t</a> kinotto_wifi_sta_info;</div><div class="line"></div><div class="line">kinotto_wifi_sta = <a class="code" href="kinotto__wifi__sta_8h.html#a83d478b076e804610cb0dbeba18679d9">kinotto_wifi_sta_init</a>(<span class="stringliteral">&quot;wlan0&quot;</span>);</div><div class="line"><span class="keywordflow">if</span> (!kinotto_wifi_sta)</div><div class="line">    <span class="keywordflow">return</span> -1;</div><div class="line"></div><div class="line">rc = <a class="code" href="kinotto__wifi__sta_8h.html#a8ed7ff663fcab4beb4b54dd37a3427b1">kinotto_wifi_sta_disconnect_network</a>(kinotto_wifi_sta,</div><div class="line">                                         &amp;kinotto_wifi_sta_info);</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (rc) {</div><div class="line">    printf(<span class="stringliteral">&quot;failed\n&quot;</span>);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// at this point you need to flush the IP address</span></div><div class="line">...</div><div class="line">kinotto_wifi_sta_destroy(kinotto_wifi_sta);</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname"><a class="el" href="structkinotto__wifi__sta.html">kinotto_wifi_sta</a></td><td>pointer to a kinotto_wifi_sta_t object. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structkinotto__wifi__sta__info.html">kinotto_wifi_sta_info</a></td><td>buffer where to copy the result. containig connection parameters. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
 
 </div>
 </div>

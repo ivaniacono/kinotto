@@ -21,7 +21,8 @@ Currently the library offers the following functionalities:
 - Assigning static IPv4 addresses
 - Assigning DHCP addresses (currently via dhclient)
 - Connecting to WPA/WPA2/Open Wi-Fi networks (via wpa_supplicant)
-- Saving Wi-Fi network informations (currently in wpa_supplicant format)
+- Disconnecting from a Wi-Fi network (via wpa_supplicant)
+- Saving Wi-Fi network information (currently in wpa_supplicant format)
 - Retriving Wi-Fi network status
 - Retriving interface status
 

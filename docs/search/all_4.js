@@ -27,6 +27,7 @@ var searchData=
   ['kinotto_5fwifi_5fsta_5fdestroy',['kinotto_wifi_sta_destroy',['../kinotto__wifi__sta_8h.html#a18027d41c0c0fec223e64a37c72523dc',1,'kinotto_wifi_sta.c']]],
   ['kinotto_5fwifi_5fsta_5fdetail',['kinotto_wifi_sta_detail',['../structkinotto__wifi__sta__detail.html',1,'']]],
   ['kinotto_5fwifi_5fsta_5fdetail_5ft',['kinotto_wifi_sta_detail_t',['../kinotto__wifi__sta__types_8h.html#a686cd6ec8b91ac234919535b65b2cf8c',1,'kinotto_wifi_sta_types.h']]],
+  ['kinotto_5fwifi_5fsta_5fdisconnect_5fnetwork',['kinotto_wifi_sta_disconnect_network',['../kinotto__wifi__sta_8h.html#a8ed7ff663fcab4beb4b54dd37a3427b1',1,'kinotto_wifi_sta.c']]],
   ['kinotto_5fwifi_5fsta_5fdisconnected',['KINOTTO_WIFI_STA_DISCONNECTED',['../kinotto__wifi__sta__types_8h.html#a59c76eb950c1add6483699efd868f8caa53058d5a5dad39702416c79eee6c46d9',1,'kinotto_wifi_sta_types.h']]],
   ['kinotto_5fwifi_5fsta_5ferror',['KINOTTO_WIFI_STA_ERROR',['../kinotto__wifi__sta__types_8h.html#a59c76eb950c1add6483699efd868f8caab5f1f5ba97f2226efc754347dc8fa82a',1,'kinotto_wifi_sta_types.h']]],
   ['kinotto_5fwifi_5fsta_5fget_5finfo',['kinotto_wifi_sta_get_info',['../kinotto__wifi__sta_8h.html#a8532a73caf953b94463e383a2d7133d3',1,'kinotto_wifi_sta.c']]],
