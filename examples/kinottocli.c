@@ -192,6 +192,7 @@ static int parse_args(int argc, char *argv[])
 		} else if (!strncmp(argv[optind], "connect", 7)) {
 			cli_args.cmd = WIFI_CLI;
 			if ((optind + 1) < argc) {
+				cli_args.sta_connect.remove_all = 1;
 				strncpy(cli_args.sta_connect.ssid, argv[optind + 1],
 					KINOTTO_WIFI_STA_SSID_LEN);
 			}
