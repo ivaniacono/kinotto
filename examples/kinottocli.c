@@ -19,12 +19,13 @@ struct kinottocli_args {
 	int dhcp;
 	int save;
 	int quiet_psk;
+	int flush;
 	char ifname[KINOTTO_IFSIZE];
 	kinotto_addr_t addr;
 	kinotto_wifi_sta_connect_t sta_connect;
 };
 
-struct kinottocli_args cli_args = {0, 0, 1, 0, 0, {0}, {{0}, {0}}, {{0}, {0}, 0, 0}};
+struct kinottocli_args cli_args = {0, 0, 1, 0, 0, 0, {0}, {{0}, {0}}, {{0}, {0}, 0, 0}};
 
 static void print_help(const char *name)
 {
@@ -51,6 +52,7 @@ static void print_help(const char *name)
 	fprintf(stderr, "  -a       DHCP (default)\n");
 	fprintf(stderr, "  -4       IPv4 address\n");
 	fprintf(stderr, "  -n       IPv4 netmask\n");
+	fprintf(stderr, "  -f       IPv4 flush\n");
 	fprintf(stderr, "  -s       save network config on success\n");
 	fprintf(stderr, "  -q       get PSK from prompt\n");
 	fprintf(stderr, "  -j       output as JSON\n");
@@ -137,7 +139,7 @@ static int parse_args(int argc, char *argv[])
 	int c = 0;
 	char *qpsk;
 
-	while ((c = getopt(argc, argv, "i:sjaq4:n:")) && (c != -1)) {
+	while ((c = getopt(argc, argv, "i:sjaqf4:n:")) && (c != -1)) {
 		switch (c) {
 		case 'i':
 			memset(cli_args.ifname, 0, KINOTTO_IFSIZE);
@@ -173,6 +175,9 @@ static int parse_args(int argc, char *argv[])
 			       KINOTTO_IPV4_STR_SIZE);
 			strncpy(cli_args.addr.ipv4_netmask, optarg,
 				KINOTTO_IPV4_STR_LEN);
+			break;
+		case 'f':
+			cli_args.flush = 1;
 			break;
 		case 'q':
 			cli_args.quiet_psk = 1;
@@ -314,7 +319,10 @@ static int exec_wifi_info()
 
 static int exec_ip_only()
 {
-	if (cli_args.dhcp) {
+	if (cli_args.flush) {
+		if (kinotto_ip_utils_flush_ipv4(cli_args.ifname))
+			goto error;
+	} else if (cli_args.dhcp) {
 		printf("Assigning DHCP address...");
 		if (assign_ipv4_dhcp(cli_args.ifname))
 			goto error;
