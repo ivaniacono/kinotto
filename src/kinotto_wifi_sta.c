@@ -110,9 +110,10 @@ int kinotto_wifi_sta_scan_networks(kinotto_wifi_sta_t *kinotto_wifi_sta,
 {
 	int ret;
 	int i = 0;
+	int retries = 2;
 
 	for (i = 0; i < buf_size; i++) {
-		// TODO: just memset all the whole struct
+		// TODO: just memset the whole struct
 		memset(buf[i].ssid, '\0', KINOTTO_WIFI_STA_SSID_BUF_SIZE);
 		memset(buf[i].bssid, '\0', KINOTTO_WIFI_STA_BSSID_BUF_SIZE);
 		memset(buf[i].security, '\0',
@@ -121,8 +122,12 @@ int kinotto_wifi_sta_scan_networks(kinotto_wifi_sta_t *kinotto_wifi_sta,
 		buf[i].level = 0;
 	}
 
-	ret = kinotto_wpa_ctrl_wrapper_scan_networks(
-	    kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper, buf, buf_size);
+	do {
+		ret = kinotto_wpa_ctrl_wrapper_scan_networks(
+		    kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper, buf, buf_size);
+		sleep(1);
+	} while (!ret && --retries);
+
 	if (-1 == ret)
 		goto error;
 
