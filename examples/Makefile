@@ -4,7 +4,7 @@ INSTALL_DIR ?= /usr/local/bin
 LDFLAGS += -lkinotto
 
 # Static
-# LDFLAGS += libkinotto.a
+# LDFLAGS += ../libkinotto.a
 
 CFLAGS += -Wall
 

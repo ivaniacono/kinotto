@@ -1,6 +1,6 @@
 #include <kinotto/kinotto_ip_utils.h>
-#include <kinotto/kinotto_wifi_sta.h>
 #include <kinotto/kinotto_json_utils.h>
+#include <kinotto/kinotto_wifi_sta.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +11,15 @@
 #define DHCP_TIMEOUT_S 30
 #define WIFI_STA_CONNECT_TIMEOUT_S 10
 
-enum cmd { IP_ONLY, IP_INFO, WIFI_SCAN, WIFI_CLI, WIFI_INFO, WIFI_DISCONNECT };
+enum cmd {
+	IP_ONLY,
+	IP_INFO,
+	MAC_ONLY,
+	WIFI_SCAN,
+	WIFI_CLI,
+	WIFI_INFO,
+	WIFI_DISCONNECT
+};
 
 struct kinottocli_args {
 	int cmd;
@@ -20,12 +28,14 @@ struct kinottocli_args {
 	int save;
 	int quiet_psk;
 	int flush;
+	int rand_mac;
 	char ifname[KINOTTO_IFSIZE];
 	kinotto_addr_t addr;
 	kinotto_wifi_sta_connect_t sta_connect;
 };
 
-struct kinottocli_args cli_args = {0, 0, 1, 0, 0, 0, {0}, {{0}, {0}}, {{0}, {0}, 0, 0}};
+struct kinottocli_args cli_args = {
+    0, 0, 1, 0, 0, 0, 0, {0}, {{0}, {0}, {0}}, {{0}, {0}, 0, 0}};
 
 static void print_help(const char *name)
 {
@@ -37,25 +47,32 @@ static void print_help(const char *name)
 	fprintf(stderr, "!__K__!  | |\\  \\ | | | | (_) | |_| || (_) | (__| | |     \n");
 	fprintf(stderr, ":     :  \\_| \\_/_|_| |_|\\___/ \\__|\\__\\___/ \\___|_|_|\n");
 	fprintf(stderr, " '''''                                     \n");
-	fprintf(stderr, "Usage: %s -i INTERFACE [OPTION]... [COMMAND]\n", name);
+	fprintf(stderr, "Usage: %s -i INTERFACE COMMAND [OPTION]...\n", name);
 	fprintf(stderr, "\n");
-	fprintf(stderr, " ip                      assign an IP address\n");
+	fprintf(stderr, " ip                      assign IP address\n");
+	fprintf(stderr, " mac 'AA:BB:CC:DD:EE:FF' assign MAC address\n");
 	fprintf(stderr, " scan                    scan networks\n");
-	fprintf(stderr, " info                    get current interface state (default command)\n");
+	fprintf(stderr, " info                    get current interface state "
+			"(default command)\n");
 	fprintf(stderr, " connect 'SSID' 'PSK'    connect to a network\n");
 	fprintf(stderr, " disconnect              disconnect from network\n");
 	fprintf(stderr,
 		" sta_info                get current Wi-Fi interface state\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, " options:\n");
-	fprintf(stderr, "  -i       interface\n");
-	fprintf(stderr, "  -a       DHCP (default)\n");
-	fprintf(stderr, "  -4       IPv4 address\n");
-	fprintf(stderr, "  -n       IPv4 netmask\n");
-	fprintf(stderr, "  -f       IPv4 flush\n");
-	fprintf(stderr, "  -s       save network config on success\n");
-	fprintf(stderr, "  -q       get PSK from prompt\n");
-	fprintf(stderr, "  -j       output as JSON\n");
+	fprintf(stderr, "Options summary:\n\n");
+	fprintf(stderr, " GENERIC\n");
+	fprintf(stderr, "   -j       output as JSON\n");
+	fprintf(stderr, "\n IP ADDRESS\n");
+	fprintf(stderr, "   -a       DHCP (default)\n");
+	fprintf(stderr, "   -4       IPv4 address\n");
+	fprintf(stderr, "   -n       IPv4 netmask\n");
+	fprintf(stderr, "   -f       IPv4 flush\n");
+	fprintf(stderr, "\n MAC ADDRESS\n");
+	fprintf(stderr, "   -r       assign a random MAC Address\n");
+	fprintf(stderr, "\n WIFI CONNECTION\n");
+	fprintf(stderr, "   -s       save network config on success\n");
+	fprintf(stderr, "   -q       get PSK from prompt\n");
+	fprintf(stderr, "\n");
 }
 
 static void print_scan_result(kinotto_wifi_sta_detail_t *scan_result,
@@ -139,7 +156,7 @@ static int parse_args(int argc, char *argv[])
 	int c = 0;
 	char *qpsk;
 
-	while ((c = getopt(argc, argv, "i:sjaqf4:n:")) && (c != -1)) {
+	while ((c = getopt(argc, argv, "i:sjaqfr4:n:")) && (c != -1)) {
 		switch (c) {
 		case 'i':
 			memset(cli_args.ifname, 0, KINOTTO_IFSIZE);
@@ -176,6 +193,8 @@ static int parse_args(int argc, char *argv[])
 			strncpy(cli_args.addr.ipv4_netmask, optarg,
 				KINOTTO_IPV4_STR_LEN);
 			break;
+		case 'r':
+			cli_args.rand_mac = 1;
 		case 'f':
 			cli_args.flush = 1;
 			break;
@@ -198,18 +217,21 @@ static int parse_args(int argc, char *argv[])
 			cli_args.cmd = WIFI_CLI;
 			if ((optind + 1) < argc) {
 				cli_args.sta_connect.remove_all = 1;
-				strncpy(cli_args.sta_connect.ssid, argv[optind + 1],
+				strncpy(cli_args.sta_connect.ssid,
+					argv[optind + 1],
 					KINOTTO_WIFI_STA_SSID_LEN);
 			}
 			if ((optind + 2) < argc) {
-				strncpy(cli_args.sta_connect.psk, argv[optind + 2],
+				strncpy(cli_args.sta_connect.psk,
+					argv[optind + 2],
 					KINOTTO_WIFI_STA_PSK_LEN);
 			} else {
 				if (cli_args.quiet_psk) {
 					qpsk = getpass("PSK: ");
 					if (qpsk) {
 						strncpy(
-						    cli_args.sta_connect.psk, qpsk,
+						    cli_args.sta_connect.psk,
+						    qpsk,
 						    KINOTTO_WIFI_STA_PSK_LEN);
 					} else {
 						goto error;
@@ -225,6 +247,12 @@ static int parse_args(int argc, char *argv[])
 			cli_args.cmd = IP_INFO;
 		} else if (!strncmp(argv[optind], "sta_info", 8)) {
 			cli_args.cmd = WIFI_INFO;
+		} else if (!strncmp(argv[optind], "mac", 3)) {
+			cli_args.cmd = MAC_ONLY;
+			if ((optind + 1) < argc) {
+				strncpy(cli_args.addr.mac_addr,
+					argv[optind + 1], KINOTTO_MAC_STR_LEN);
+			}
 		} else if (!strncmp(argv[optind], "ip", 2)) {
 			cli_args.cmd = IP_ONLY;
 		} else {
@@ -277,6 +305,10 @@ static int exec_ip_info()
 	kinotto_addr_t kinotto_addr = {0};
 	char json_res[JSON_RES_BUF_SIZE];
 
+	if (kinotto_ip_utils_get_mac(cli_args.ifname, &kinotto_addr)) {
+		strncpy(kinotto_addr.mac_addr, "NOT_ASSIGNED",
+			KINOTTO_MAC_STR_LEN);
+	}
 	if (kinotto_ip_utils_get_ipv4(cli_args.ifname, &kinotto_addr)) {
 		strncpy(kinotto_addr.ipv4_addr, "NOT_ASSIGNED",
 			KINOTTO_IPV4_STR_LEN);
@@ -285,9 +317,11 @@ static int exec_ip_info()
 	}
 
 	if (cli_args.json_output) {
-		kinotto_ip_utils_ip_info_json(&kinotto_addr, json_res, JSON_RES_BUF_SIZE);
+		kinotto_ip_utils_ip_info_json(&kinotto_addr, json_res,
+					      JSON_RES_BUF_SIZE);
 		printf("%s\n", json_res);
 	} else {
+		printf("MAC Addr: %s\n", kinotto_addr.mac_addr);
 		printf("IPv4: %s\n", kinotto_addr.ipv4_addr);
 		printf("Netmask: %s\n", kinotto_addr.ipv4_netmask);
 	}
@@ -340,6 +374,24 @@ error:
 	return -1;
 }
 
+static int exec_mac_only()
+{
+	if (cli_args.rand_mac) {
+		if (kinotto_ip_utils_rand_mac(cli_args.ifname))
+			goto error;
+	} else {
+		if (kinotto_ip_utils_set_mac(cli_args.ifname, &cli_args.addr))
+			goto error;
+	}
+
+	printf("OK\n");
+	return 0;
+
+error:
+	printf("failed\n");
+	return -1;
+}
+
 static int exec_wifi_client()
 {
 	int rc = 0;
@@ -354,8 +406,7 @@ static int exec_wifi_client()
 
 	printf("Connecting to %s...", cli_args.sta_connect.ssid);
 	rc = kinotto_wifi_sta_connect_network(
-	    kinotto_wifi_sta, &kinotto_wifi_sta_info,
-		&cli_args.sta_connect);
+	    kinotto_wifi_sta, &kinotto_wifi_sta_info, &cli_args.sta_connect);
 
 	if (rc) {
 		printf("failed\n");
@@ -395,7 +446,7 @@ static int exec_wifi_disconnect()
 		return -1;
 
 	rc = kinotto_wifi_sta_disconnect_network(kinotto_wifi_sta,
-		&kinotto_wifi_sta_info);
+						 &kinotto_wifi_sta_info);
 
 	if (rc) {
 		printf("failed\n");
@@ -431,6 +482,9 @@ static int exec_cmd()
 		break;
 	case WIFI_INFO:
 		ret = exec_wifi_info();
+		break;
+	case MAC_ONLY:
+		ret = exec_mac_only();
 		break;
 	default:
 		return -1;

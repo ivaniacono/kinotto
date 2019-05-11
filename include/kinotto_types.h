@@ -32,12 +32,23 @@ extern "C" {
 #define KINOTTO_IPV4_STR_SIZE (KINOTTO_IPV4_STR_LEN + 1)
 
 /**
+ * MAC string length
+ */
+#define KINOTTO_MAC_STR_LEN 17
+
+/**
+ * MAC string vector size
+ */
+#define KINOTTO_MAC_STR_SIZE (KINOTTO_MAC_STR_LEN + 1)
+
+/**
  * Structure to contain IP addresses
  */
 typedef struct kinotto_addr {
 	/*@{*/
 	char ipv4_addr[KINOTTO_IPV4_STR_SIZE]; /**< IPv4 string */
 	char ipv4_netmask[KINOTTO_IPV4_STR_SIZE]; /**< IPv4 netmask string */
+	char mac_addr[KINOTTO_MAC_STR_SIZE]; /**< MAC string */
 	/*@}*/
 } kinotto_addr_t;
 

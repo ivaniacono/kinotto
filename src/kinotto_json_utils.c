@@ -37,6 +37,7 @@ int kinotto_ip_utils_ip_info_json(kinotto_addr_t *kinotto_addr, char *buf,
 				  int buf_size)
 {
 	const char json_model[] = "{"
+				  "\"mac_addr\":\"%s\","
 				  "\"ipv4\":\"%s\","
 				  "\"netmask\":\"%s\""
 				  "}";
@@ -46,8 +47,8 @@ int kinotto_ip_utils_ip_info_json(kinotto_addr_t *kinotto_addr, char *buf,
 
 	memset(buf, '\0', buf_size);
 
-	snprintf(buf, buf_size, json_model, kinotto_addr->ipv4_addr,
-		 kinotto_addr->ipv4_netmask);
+	snprintf(buf, buf_size, json_model, kinotto_addr->mac_addr,
+		 kinotto_addr->ipv4_addr, kinotto_addr->ipv4_netmask);
 
 	return 0;
 
@@ -116,9 +117,8 @@ error:
 	return -1;
 }
 
-int kinotto_wifi_sta_scan_result_json(
-    struct kinotto_wifi_sta_detail *scan_res, int scan_size, char *buf,
-    int buf_size)
+int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
+				      int scan_size, char *buf, int buf_size)
 {
 	int i;
 	const char json_model[] = "{"

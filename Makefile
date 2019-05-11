@@ -27,7 +27,7 @@ WPA_OBJ_FILES := $(patsubst $(WPA_SUPPLICANT)/%.c,%.o,$(WPA_C_FILES))
 
 CC ?= gcc
 
-.PHONY = doc libkinotto.so libkinotto.a install clean
+.PHONY = doc libkinotto.so libkinotto.a install clean clean_doc
 
 all: libkinotto.so libkinotto.a
 
@@ -58,4 +58,6 @@ install:
 
 clean:
 	rm -f *.a *.so *.o
+
+clean_doc:
 	rm -rf docs
