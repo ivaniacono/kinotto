@@ -97,6 +97,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a9d61678f227ff1722ee635efb0421d59"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__ip__utils_8h.html#a9d61678f227ff1722ee635efb0421d59">kinotto_ip_utils_get_ipv4</a> (const char *ifname, <a class="el" href="kinotto__types_8h.html#ad270351f65cd12ad261e275c8c0b20c1">kinotto_addr_t</a> *<a class="el" href="structkinotto__addr.html">kinotto_addr</a>)</td></tr>
 <tr class="memdesc:a9d61678f227ff1722ee635efb0421d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get IPv4 information.  <a href="#a9d61678f227ff1722ee635efb0421d59">More...</a><br /></td></tr>
 <tr class="separator:a9d61678f227ff1722ee635efb0421d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cea8a009018ef4e7a29f61213d001a1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__ip__utils_8h.html#a6cea8a009018ef4e7a29f61213d001a1">kinotto_ip_utils_set_mac</a> (const char *ifname, const <a class="el" href="kinotto__types_8h.html#ad270351f65cd12ad261e275c8c0b20c1">kinotto_addr_t</a> *<a class="el" href="structkinotto__addr.html">kinotto_addr</a>)</td></tr>
+<tr class="memdesc:a6cea8a009018ef4e7a29f61213d001a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign a MAC address.  <a href="#a6cea8a009018ef4e7a29f61213d001a1">More...</a><br /></td></tr>
+<tr class="separator:a6cea8a009018ef4e7a29f61213d001a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad83b04246dacaa91ed00607ec5268539"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__ip__utils_8h.html#ad83b04246dacaa91ed00607ec5268539">kinotto_ip_utils_get_mac</a> (const char *ifname, <a class="el" href="kinotto__types_8h.html#ad270351f65cd12ad261e275c8c0b20c1">kinotto_addr_t</a> *<a class="el" href="structkinotto__addr.html">kinotto_addr</a>)</td></tr>
+<tr class="memdesc:ad83b04246dacaa91ed00607ec5268539"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get MAC address.  <a href="#ad83b04246dacaa91ed00607ec5268539">More...</a><br /></td></tr>
+<tr class="separator:ad83b04246dacaa91ed00607ec5268539"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7c1521b533062ff4341eb0c4b019cff"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kinotto__ip__utils_8h.html#ae7c1521b533062ff4341eb0c4b019cff">kinotto_ip_utils_rand_mac</a> (const char *ifname)</td></tr>
+<tr class="memdesc:ae7c1521b533062ff4341eb0c4b019cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign a random MAC address.  <a href="#ae7c1521b533062ff4341eb0c4b019cff">More...</a><br /></td></tr>
+<tr class="separator:ae7c1521b533062ff4341eb0c4b019cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Kinotto IP utils. </p>
@@ -159,6 +168,45 @@ Functions</h2></td></tr>
 <p>Get IPv4 information. </p>
 <p>Get IPv4 information for a specified interface.</p>
 <div class="fragment"><div class="line"><a class="code" href="structkinotto__addr.html">kinotto_addr_t</a> <a class="code" href="structkinotto__addr.html">kinotto_addr</a> = {0};</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="kinotto__ip__utils_8h.html#a9d61678f227ff1722ee635efb0421d59">kinotto_ip_utils_get_ipv4</a>(<span class="stringliteral">&quot;wlan0&quot;</span>, &amp;kinotto_addr)) {</div><div class="line">    <span class="keywordflow">return</span> -1;</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ifname</td><td>interface to use. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structkinotto__addr.html">kinotto_addr</a></td><td>pointer to a kinotto_addr_t. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
+
+</div>
+</div>
+<a id="ad83b04246dacaa91ed00607ec5268539"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad83b04246dacaa91ed00607ec5268539">&#9670;&nbsp;</a></span>kinotto_ip_utils_get_mac()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kinotto_ip_utils_get_mac </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>ifname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kinotto__types_8h.html#ad270351f65cd12ad261e275c8c0b20c1">kinotto_addr_t</a> *&#160;</td>
+          <td class="paramname"><em>kinotto_addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get MAC address. </p>
+<p>Get MAC address of a specified interface.</p>
+<div class="fragment"><div class="line"><a class="code" href="structkinotto__addr.html">kinotto_addr_t</a> kinotto_addr = {0};</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="kinotto__ip__utils_8h.html#ad83b04246dacaa91ed00607ec5268539">kinotto_ip_utils_get_mac</a>(<span class="stringliteral">&quot;wlan0&quot;</span>, &amp;kinotto_addr)) {</div><div class="line">    <span class="keywordflow">return</span> -1;</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ifname</td><td>interface to use. </td></tr>
     <tr><td class="paramname"><a class="el" href="structkinotto__addr.html">kinotto_addr</a></td><td>pointer to a kinotto_addr_t. </td></tr>
@@ -236,7 +284,74 @@ Functions</h2></td></tr>
 
 <p>Assign a static IP address. </p>
 <p>Assign a static IP address to an interface.</p>
-<div class="fragment"><div class="line"><a class="code" href="structkinotto__addr.html">kinotto_addr_t</a> addr;</div><div class="line"></div><div class="line">memset(cli_args.addr.ipv4_addr, 0, <a class="code" href="kinotto__types_8h.html#ae476361f4e542c4e7f0b6bf077f82143">KINOTTO_IPV4_STR_SIZE</a>);</div><div class="line">memset(cli_args.addr.ipv4_netmask, 0, <a class="code" href="kinotto__types_8h.html#ae476361f4e542c4e7f0b6bf077f82143">KINOTTO_IPV4_STR_SIZE</a>);</div><div class="line">strncpy(cli_args.addr.ipv4_addr, <span class="stringliteral">&quot;192.168.1.50&quot;</span>, <a class="code" href="kinotto__types_8h.html#a20f2611cbe4845549fb8f26cce48220e">KINOTTO_IPV4_STR_LEN</a>);</div><div class="line">strncpy(cli_args.addr.ipv4_netmask, <span class="stringliteral">&quot;255.255.255.0&quot;</span>, <a class="code" href="kinotto__types_8h.html#a20f2611cbe4845549fb8f26cce48220e">KINOTTO_IPV4_STR_LEN</a>);</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="kinotto__ip__utils_8h.html#a7f2c671ddfba4f90cd410e38ac1731c8">kinotto_ip_utils_ipv4_static</a>(<span class="stringliteral">&quot;wlan0&quot;</span>, &amp;addr);</div><div class="line">    <span class="keywordflow">return</span> -1;</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line"><a class="code" href="structkinotto__addr.html">kinotto_addr_t</a> addr;</div><div class="line"></div><div class="line">memset(addr.<a class="code" href="structkinotto__addr.html#a39a621f24e8d2445090fbbab04d4febc">ipv4_addr</a>, 0, <a class="code" href="kinotto__types_8h.html#ae476361f4e542c4e7f0b6bf077f82143">KINOTTO_IPV4_STR_SIZE</a>);</div><div class="line">memset(addr.<a class="code" href="structkinotto__addr.html#a105a3713e156f96b3409d70d34a20d7f">ipv4_netmask</a>, 0, <a class="code" href="kinotto__types_8h.html#ae476361f4e542c4e7f0b6bf077f82143">KINOTTO_IPV4_STR_SIZE</a>);</div><div class="line">strncpy(addr.<a class="code" href="structkinotto__addr.html#a39a621f24e8d2445090fbbab04d4febc">ipv4_addr</a>, <span class="stringliteral">&quot;192.168.1.50&quot;</span>, <a class="code" href="kinotto__types_8h.html#a20f2611cbe4845549fb8f26cce48220e">KINOTTO_IPV4_STR_LEN</a>);</div><div class="line">strncpy(addr.<a class="code" href="structkinotto__addr.html#a105a3713e156f96b3409d70d34a20d7f">ipv4_netmask</a>, <span class="stringliteral">&quot;255.255.255.0&quot;</span>, <a class="code" href="kinotto__types_8h.html#a20f2611cbe4845549fb8f26cce48220e">KINOTTO_IPV4_STR_LEN</a>);</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="kinotto__ip__utils_8h.html#a7f2c671ddfba4f90cd410e38ac1731c8">kinotto_ip_utils_ipv4_static</a>(<span class="stringliteral">&quot;wlan0&quot;</span>, &amp;addr);</div><div class="line">    <span class="keywordflow">return</span> -1;</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ifname</td><td>interface to use. </td></tr>
+    <tr><td class="paramname"><a class="el" href="structkinotto__addr.html">kinotto_addr</a></td><td>pointer to a kinotto_addr_t; </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure </dd></dl>
+
+</div>
+</div>
+<a id="ae7c1521b533062ff4341eb0c4b019cff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7c1521b533062ff4341eb0c4b019cff">&#9670;&nbsp;</a></span>kinotto_ip_utils_rand_mac()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kinotto_ip_utils_rand_mac </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>ifname</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Assign a random MAC address. </p>
+<p>Assign a random MAC address to an interface.</p>
+<div class="fragment"><div class="line"><a class="code" href="kinotto__ip__utils_8h.html#ae7c1521b533062ff4341eb0c4b019cff">kinotto_ip_utils_rand_mac</a>(<span class="stringliteral">&quot;wlan0&quot;</span>);</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ifname</td><td>interface to use. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
+
+</div>
+</div>
+<a id="a6cea8a009018ef4e7a29f61213d001a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cea8a009018ef4e7a29f61213d001a1">&#9670;&nbsp;</a></span>kinotto_ip_utils_set_mac()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int kinotto_ip_utils_set_mac </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>ifname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="kinotto__types_8h.html#ad270351f65cd12ad261e275c8c0b20c1">kinotto_addr_t</a> *&#160;</td>
+          <td class="paramname"><em>kinotto_addr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Assign a MAC address. </p>
+<p>Assign a MAC address to an interface.</p>
+<div class="fragment"><div class="line"><a class="code" href="structkinotto__addr.html">kinotto_addr_t</a> kinotto_addr;</div><div class="line"></div><div class="line">memset(addr.<a class="code" href="structkinotto__addr.html#ae33df785f39a2b788872a5e4e0575b2d">mac_addr</a>, 0, <a class="code" href="kinotto__types_8h.html#acaa2ed4278253f56f5a2735e821c5755">KINOTTO_MAC_STR_SIZE</a>);</div><div class="line">strncpy(addr.<a class="code" href="structkinotto__addr.html#ae33df785f39a2b788872a5e4e0575b2d">mac_addr</a>, <span class="stringliteral">&quot;DE:AD:BE:EF:DE:AD&quot;</span>, <a class="code" href="kinotto__types_8h.html#a94a7613f9ebbf132666180d7e4642916">KINOTTO_MAC_STR_LEN</a>);</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="kinotto__ip__utils_8h.html#a6cea8a009018ef4e7a29f61213d001a1">kinotto_ip_utils_set_mac</a>(<span class="stringliteral">&quot;wlan0&quot;</span>, &amp;kinotto_addr))</div><div class="line">    <span class="keywordflow">return</span> -1;</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ifname</td><td>interface to use. </td></tr>
     <tr><td class="paramname"><a class="el" href="structkinotto__addr.html">kinotto_addr</a></td><td>pointer to a kinotto_addr_t; </td></tr>

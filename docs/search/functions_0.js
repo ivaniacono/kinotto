@@ -2,9 +2,12 @@ var searchData=
 [
   ['kinotto_5fip_5futils_5fflush_5fipv4',['kinotto_ip_utils_flush_ipv4',['../kinotto__ip__utils_8h.html#a15d51bd62348c71c49bd5ea7dc0cd2a1',1,'kinotto_ip_utils.c']]],
   ['kinotto_5fip_5futils_5fget_5fipv4',['kinotto_ip_utils_get_ipv4',['../kinotto__ip__utils_8h.html#a9d61678f227ff1722ee635efb0421d59',1,'kinotto_ip_utils.c']]],
+  ['kinotto_5fip_5futils_5fget_5fmac',['kinotto_ip_utils_get_mac',['../kinotto__ip__utils_8h.html#ad83b04246dacaa91ed00607ec5268539',1,'kinotto_ip_utils.c']]],
   ['kinotto_5fip_5futils_5fip_5finfo_5fjson',['kinotto_ip_utils_ip_info_json',['../kinotto__json__utils_8h.html#a02fc105f220cef3c035e5ee178d81fcb',1,'kinotto_json_utils.c']]],
   ['kinotto_5fip_5futils_5fipv4_5fdhcp',['kinotto_ip_utils_ipv4_dhcp',['../kinotto__ip__utils_8h.html#a989d8e5b6fea76796dd6f50330295fd3',1,'kinotto_ip_utils.c']]],
   ['kinotto_5fip_5futils_5fipv4_5fstatic',['kinotto_ip_utils_ipv4_static',['../kinotto__ip__utils_8h.html#a7f2c671ddfba4f90cd410e38ac1731c8',1,'kinotto_ip_utils.c']]],
+  ['kinotto_5fip_5futils_5frand_5fmac',['kinotto_ip_utils_rand_mac',['../kinotto__ip__utils_8h.html#ae7c1521b533062ff4341eb0c4b019cff',1,'kinotto_ip_utils.c']]],
+  ['kinotto_5fip_5futils_5fset_5fmac',['kinotto_ip_utils_set_mac',['../kinotto__ip__utils_8h.html#a6cea8a009018ef4e7a29f61213d001a1',1,'kinotto_ip_utils.c']]],
   ['kinotto_5fwifi_5fsta_5fconnect_5fnetwork',['kinotto_wifi_sta_connect_network',['../kinotto__wifi__sta_8h.html#a6bd6e47e70268f1472bd99eae626ac05',1,'kinotto_wifi_sta.c']]],
   ['kinotto_5fwifi_5fsta_5fdestroy',['kinotto_wifi_sta_destroy',['../kinotto__wifi__sta_8h.html#a18027d41c0c0fec223e64a37c72523dc',1,'kinotto_wifi_sta.c']]],
   ['kinotto_5fwifi_5fsta_5fdisconnect_5fnetwork',['kinotto_wifi_sta_disconnect_network',['../kinotto__wifi__sta_8h.html#a8ed7ff663fcab4beb4b54dd37a3427b1',1,'kinotto_wifi_sta.c']]],

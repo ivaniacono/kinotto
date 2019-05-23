@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['remove_5fall',['remove_all',['../structkinotto__wifi__sta__connect.html#a019afdfcf9fae09acb2c79367305ffe2',1,'kinotto_wifi_sta_connect']]]
+  ['psk',['psk',['../structkinotto__wifi__sta__connect.html#aa1b8dd59e11a99e429f4bcd1635328d3',1,'kinotto_wifi_sta_connect']]]
 ];

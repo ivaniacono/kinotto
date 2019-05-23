@@ -20,6 +20,7 @@ abstracting the platform specific system calls.
 Currently the library offers the following functionalities:
 - Assigning static IPv4 addresses
 - Assigning DHCP addresses (currently via dhclient)
+- Assigning MAC addresses including random ones
 - Connecting to WPA/WPA2/Open Wi-Fi networks (via wpa_supplicant)
 - Disconnecting from a Wi-Fi network (via wpa_supplicant)
 - Saving Wi-Fi network information (currently in wpa_supplicant format)
