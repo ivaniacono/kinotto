@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <linux/if.h>
 #include <linux/if_arp.h>
+#include <net/if.h> // kinotto_ip_utils_get_ifaces()
 #include <stdio.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,10 +28,16 @@ static int kinotto_ip_utils_has_ipv4(const char *ifname)
 {
 	kinotto_addr_t kinotto_addr = {0};
 
+	if (!strlen(ifname))
+		goto error;
+
 	if (kinotto_ip_utils_get_ipv4(ifname, &kinotto_addr))
 		return -1;
 
 	return 0;
+
+error:
+	return -1;
 }
 
 int kinotto_ip_utils_ipv4_static(const char *ifname,
@@ -38,8 +45,12 @@ int kinotto_ip_utils_ipv4_static(const char *ifname,
 {
 	struct ifreq ifr;
 	struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
-	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+	int fd;
 
+	if (!strlen(ifname) || !kinotto_addr)
+		goto error_fd;
+
+	fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	if (-1 == fd)
 		goto error_fd;
 
@@ -79,15 +90,25 @@ error_fd:
 int kinotto_ip_utils_flush_ipv4(const char *ifname)
 {
 	kinotto_addr_t kinotto_addr = {"0.0.0.0", "0.0.0.0"};
+
+	if (!strlen(ifname))
+		goto error;
+
 	kinotto_ip_utils_ipv4_static(ifname, &kinotto_addr);
 
 	return 0;
+
+error:
+	return -1;
 }
 
 /* TODO: add router and DNS functionalities */
 
 int kinotto_ip_utils_ipv4_dhcp(const char *ifname, int timeout)
 {
+	if (!strlen(ifname))
+		goto error;
+
 #ifdef DHCLIENT
 	int pid = 0;
 
@@ -130,8 +151,12 @@ int kinotto_ip_utils_get_ipv4(const char *ifname, kinotto_addr_t *kinotto_addr)
 {
 	struct ifreq ifr;
 	struct sockaddr_in *addr = (struct sockaddr_in *)&ifr.ifr_addr;
-	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+	int fd;
 
+	if (!strlen(ifname) || !kinotto_addr)
+		goto error;
+
+	fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	memset(kinotto_addr->ipv4_addr, 0, KINOTTO_IPV4_STR_SIZE);
 	memset(kinotto_addr->ipv4_netmask, 0, KINOTTO_IPV4_STR_SIZE);
 
@@ -170,9 +195,13 @@ int kinotto_ip_utils_set_mac(const char *ifname,
 			     const kinotto_addr_t *kinotto_addr)
 {
 	struct ifreq ifr;
-	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+	int fd;
 	int ret = 0;
 
+	if (!strlen(ifname) || !kinotto_addr)
+		goto error;
+
+	fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	if (-1 == fd)
 		goto error_fd;
 
@@ -217,6 +246,9 @@ int kinotto_ip_utils_rand_mac(const char *ifname)
 	unsigned char rand_mac[6] = {0};
 	kinotto_addr_t kinotto_addr = {{0}, {0}, {0}};
 
+	if (!strlen(ifname))
+		goto error;
+
 	fd = fopen("/dev/urandom", "rb");
 	if (!fd)
 		goto error_fd;
@@ -250,6 +282,9 @@ int kinotto_ip_utils_get_mac(const char *ifname, kinotto_addr_t *kinotto_addr)
 	struct ifreq ifr;
 	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
+	if (!strlen(ifname) || !kinotto_addr)
+		goto error;
+
 	memset(kinotto_addr->mac_addr, 0, KINOTTO_MAC_STR_SIZE);
 
 	if (-1 == fd)
@@ -281,3 +316,30 @@ error_fd:
 }
 
 // TODO: add IPv6 support
+
+int kinotto_ip_utils_get_ifaces(kinotto_info_t *kinotto_info, int size)
+{
+	struct if_nameindex *if_ni, *i;
+
+	if (!kinotto_info)
+		goto error;
+
+	if_ni = if_nameindex();
+	if (!if_ni) {
+		goto error;
+	}
+
+	i = if_ni;
+	while (i->if_index && i->if_name && i->if_index < size) {
+		snprintf(kinotto_info[i->if_index - 1].ifname, KINOTTO_IFSIZE,
+			 "%s", i->if_name);
+		i++;
+	}
+
+	if_freenameindex(if_ni);
+
+	return 0;
+
+error:
+	return -1;
+}

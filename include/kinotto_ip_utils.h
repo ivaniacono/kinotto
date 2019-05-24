@@ -143,6 +143,21 @@ int kinotto_ip_utils_get_mac(const char *ifname, kinotto_addr_t *kinotto_addr);
  */
 int kinotto_ip_utils_rand_mac(const char *ifname);
 
+/**
+ * @brief Get all interfaces available
+ *
+ * Get a list of interfaces available in the system.
+ *
+ * @code
+ * int kinotto_ip_utils_get_ifaces(kinotto_info_t *kinotto_info, int size);
+ * @endcode
+ *
+ * @param kinotto_info pointer to a list of kinotto_info_t.
+ * @param size number of kinotto_info_t elements.
+ * @return 0 on success, -1 on error.
+ */
+int kinotto_ip_utils_get_ifaces(kinotto_info_t *kinotto_info, int size);
+
 #ifdef __cplusplus
 }
 #endif

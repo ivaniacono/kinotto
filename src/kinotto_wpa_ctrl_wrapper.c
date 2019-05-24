@@ -263,7 +263,7 @@ static int kinotto_wpa_ctrl_wrapper_parse_security(const char *flags, int len,
 	}
 
 	/* TODO: match ESS otherwhise throw error? */
-	strncpy(buf, "NONE", 4);
+	strncpy(buf, "NONE", 5);
 	return 0;
 
 error_unsupported:
@@ -311,7 +311,7 @@ kinotto_wpa_ctrl_wrapper_parse_bss(const char *scan_result, int result_size,
 		} else if (!strncmp(left, "ssid", 4)) {
 			if (kinotto_wpa_ctrl_wrapper_ssid_is_hidden(
 				right, strlen(right)))
-				strncpy(buf->ssid, "(hidden)", 8);
+				strncpy(buf->ssid, "(hidden)", 9);
 			else
 				strncpy(buf->ssid, right,
 					KINOTTO_WIFI_STA_SSID_LEN);
@@ -415,7 +415,7 @@ kinotto_wpa_ctrl_wrapper_parse_status(const char *status_result,
 			if (kinotto_wpa_ctrl_wrapper_ssid_is_hidden(
 				right, strlen(right)))
 				strncpy(buf->sta.ssid, "(hidden)",
-					8); // TODO: use a macro for hidden
+					9); // TODO: use a macro for hidden
 			else
 				strncpy(buf->sta.ssid, right,
 					KINOTTO_WIFI_STA_SSID_LEN);

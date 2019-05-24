@@ -61,6 +61,7 @@ static void print_help(const char *name)
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options summary:\n\n");
 	fprintf(stderr, " GENERIC\n");
+	fprintf(stderr, "   -h       print this help\n");
 	fprintf(stderr, "   -j       output as JSON\n");
 	fprintf(stderr, "\n IP ADDRESS\n");
 	fprintf(stderr, "   -a       DHCP (default)\n");
@@ -156,8 +157,10 @@ static int parse_args(int argc, char *argv[])
 	int c = 0;
 	char *qpsk;
 
-	while ((c = getopt(argc, argv, "i:sjaqfr4:n:")) && (c != -1)) {
+	while ((c = getopt(argc, argv, "i:hsjaqfr4:n:")) && (c != -1)) {
 		switch (c) {
+		case 'h':
+			goto help;
 		case 'i':
 			memset(cli_args.ifname, 0, KINOTTO_IFSIZE);
 			if (strlen(optarg) > KINOTTO_IFSIZE)
@@ -204,10 +207,6 @@ static int parse_args(int argc, char *argv[])
 		default:
 			goto error;
 		}
-	}
-
-	if (!strlen(cli_args.ifname)) {
-		goto error;
 	}
 
 	if (optind < argc) {
@@ -266,6 +265,10 @@ static int parse_args(int argc, char *argv[])
 
 error:
 	return -1;
+
+help:
+	print_help(argv[0]);
+	return -1;
 }
 
 static int exec_wifi_scan()
@@ -300,16 +303,16 @@ error:
 	return -1;
 }
 
-static int exec_ip_info()
+static int ip_info(char *ifname)
 {
 	kinotto_addr_t kinotto_addr = {0};
 	char json_res[JSON_RES_BUF_SIZE];
 
-	if (kinotto_ip_utils_get_mac(cli_args.ifname, &kinotto_addr)) {
+	if (kinotto_ip_utils_get_mac(ifname, &kinotto_addr)) {
 		strncpy(kinotto_addr.mac_addr, "NOT_ASSIGNED",
 			KINOTTO_MAC_STR_LEN);
 	}
-	if (kinotto_ip_utils_get_ipv4(cli_args.ifname, &kinotto_addr)) {
+	if (kinotto_ip_utils_get_ipv4(ifname, &kinotto_addr)) {
 		strncpy(kinotto_addr.ipv4_addr, "NOT_ASSIGNED",
 			KINOTTO_IPV4_STR_LEN);
 		strncpy(kinotto_addr.ipv4_netmask, "NOT_ASSIGNED",
@@ -321,9 +324,31 @@ static int exec_ip_info()
 					      JSON_RES_BUF_SIZE);
 		printf("%s\n", json_res);
 	} else {
+		printf("Interface: %s\n", ifname);
 		printf("MAC Addr: %s\n", kinotto_addr.mac_addr);
 		printf("IPv4: %s\n", kinotto_addr.ipv4_addr);
 		printf("Netmask: %s\n", kinotto_addr.ipv4_netmask);
+	}
+
+	return 0;
+}
+
+static int exec_ip_info()
+{
+	// TODO: check for ifname in kinotto library
+
+	int i = 0;
+	kinotto_info_t info[12] = {0};
+
+	if (strlen(cli_args.ifname)) {
+		strncpy(info[i].ifname, cli_args.ifname, KINOTTO_IFSIZE);
+	} else {
+		kinotto_ip_utils_get_ifaces(info, sizeof(info)/sizeof(info[0]));
+	}
+
+	for (i = 0; strlen(info[i].ifname); i++) {
+		ip_info(info[i].ifname);
+		printf("\n");
 	}
 
 	return 0;
@@ -497,17 +522,12 @@ int main(int argc, char *argv[])
 {
 	setvbuf(stdout, NULL, _IONBF, 0);
 
-	if (1 == argc) {
-		goto help;
-	}
-
 	if (parse_args(argc, argv)) {
-		goto help;
+		goto args_error;
 	}
 
 	return exec_cmd();
 
-help:
-	print_help(argv[0]);
+args_error:
 	return 1;
 }
