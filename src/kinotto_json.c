@@ -1,30 +1,29 @@
-#include "kinotto_json_utils.h"
-#include "kinotto_ip_utils.h"
+#include "kinotto_json.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static int kinotto_wifi_sta_escape_ssid(const char *ssid, size_t ssid_len,
-					char *buf, int buf_size);
+static int kinotto_json_wifi_sta_escape_ssid(const char *ssid, size_t ssid_len,
+					     char *dest, int n);
 
-static int kinotto_wifi_sta_escape_ssid(const char *ssid, size_t ssid_len,
-					char *buf, int buf_size)
+static int kinotto_json_wifi_sta_escape_ssid(const char *ssid, size_t ssid_len,
+					     char *dest, int n)
 {
 	int i = 0;
 	int buf_offset = 0;
 
 	/* Check buffer size is double of ssid buffer plus NULL termitating char
 	 */
-	if (buf_size < (ssid_len * 2) + 1)
+	if (n < (ssid_len * 2) + 1)
 		goto error_small_buffer;
 
 	for (i = 0; i < ssid_len; i++) {
 		if ('\\' == ssid[i] || '"' == ssid[i])
-			buf[buf_offset++] = '\\';
+			dest[buf_offset++] = '\\';
 
-		buf[buf_offset++] = ssid[i];
+		dest[buf_offset++] = ssid[i];
 	}
-	buf[buf_offset] = '\0';
+	dest[buf_offset] = '\0';
 
 	return 0;
 
@@ -33,22 +32,22 @@ error_small_buffer:
 	return -1;
 }
 
-int kinotto_ip_utils_ip_info_json(kinotto_addr_t *kinotto_addr, char *buf,
-				  int buf_size)
+int kinotto_json_ip_info(kinotto_info_t *src, char *dest, int n)
 {
 	const char json_model[] = "{"
+				  "\"ifname\":\"%s\","
 				  "\"mac_addr\":\"%s\","
 				  "\"ipv4\":\"%s\","
 				  "\"netmask\":\"%s\""
 				  "}";
 
-	if (NULL == kinotto_addr || !buf_size)
+	if (NULL == src || !n)
 		goto error;
 
-	memset(buf, '\0', buf_size);
+	memset(dest, '\0', n);
 
-	snprintf(buf, buf_size, json_model, kinotto_addr->mac_addr,
-		 kinotto_addr->ipv4_addr, kinotto_addr->ipv4_netmask);
+	snprintf(dest, n, json_model, src->ifname, src->addr.mac_addr,
+		 src->addr.ipv4_addr, src->addr.ipv4_netmask);
 
 	return 0;
 
@@ -56,8 +55,42 @@ error:
 	return -1;
 }
 
-int kinotto_wifi_sta_info_json(kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
-			       char *buf, int buf_size)
+int kinotto_json_ifaces_list(kinotto_info_t *src, int src_n, char *dest, int n)
+{
+	char json_entry[144]; // TODO: define json_entry size
+	int i = 0;
+	int j = 0;
+
+	if (!src || !n)
+		goto error;
+
+	memset(dest, '\0', n);
+
+	dest[j++] = '[';
+
+	for (i = 0; i < src_n; i++) {
+		if (kinotto_json_ip_info(&src[i], json_entry,
+					 sizeof(json_entry)))
+			goto error;
+
+		int json_len = strlen(json_entry);
+		if (i)
+			dest[j++] = ',';
+
+		if (n > (j + json_len)) {
+			strncpy(&dest[j], json_entry, json_len);
+			j += json_len;
+		}
+	}
+	dest[j] = ']';
+
+	return 0;
+
+error:
+	return -1;
+}
+
+int kinotto_json_sta_info(kinotto_wifi_sta_info_t *src, char *dest, int n)
 {
 	const char json_model_connected[] = "{"
 					    "\"status\":\"%s\","
@@ -73,8 +106,10 @@ int kinotto_wifi_sta_info_json(kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
 
 	char *escaped_ssid;
 
-	if (NULL == kinotto_wifi_sta_info || !buf_size)
+	if (NULL == src || !n)
 		goto error;
+
+	// TODO: do not use heap memory
 
 	escaped_ssid =
 	    (char *)calloc((KINOTTO_WIFI_STA_SSID_LEN * 2) + 1, sizeof(char));
@@ -83,28 +118,24 @@ int kinotto_wifi_sta_info_json(kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
 	}
 
 	// Escape SSID
-	if (kinotto_wifi_sta_escape_ssid(
-		kinotto_wifi_sta_info->sta.ssid,
-		strlen(kinotto_wifi_sta_info->sta.ssid), escaped_ssid,
+	if (kinotto_json_wifi_sta_escape_ssid(
+		src->sta.ssid, strlen(src->sta.ssid), escaped_ssid,
 		(KINOTTO_WIFI_STA_SSID_LEN * 2) + 1))
 		goto error;
 
-	memset(buf, '\0', buf_size);
+	memset(dest, '\0', n);
 
-	switch (kinotto_wifi_sta_info->state) {
+	switch (src->state) {
 	case KINOTTO_WIFI_STA_ERROR:
 	case KINOTTO_WIFI_STA_DISCONNECTED:
 	case KINOTTO_WIFI_STA_SCANNING:
 	case KINOTTO_WIFI_STA_CONNECTING:
-		snprintf(buf, buf_size, json_model_disconnected,
-			 "disconnected");
+		snprintf(dest, n, json_model_disconnected, "disconnected");
 		break;
 	case KINOTTO_WIFI_STA_CONNECTED:
-		snprintf(buf, buf_size, json_model_connected, "connected",
-			 kinotto_wifi_sta_info->sta.bssid,
-			 kinotto_wifi_sta_info->sta.ssid,
-			 kinotto_wifi_sta_info->sta.security,
-			 kinotto_wifi_sta_info->sta.frequency);
+		snprintf(dest, n, json_model_connected, "connected",
+			 src->sta.bssid, src->sta.ssid, src->sta.security,
+			 src->sta.frequency);
 		break;
 	}
 
@@ -117,8 +148,8 @@ error:
 	return -1;
 }
 
-int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
-				      int scan_size, char *buf, int buf_size)
+int kinotto_json_sta_scan_result(struct kinotto_wifi_sta_detail *scan_res,
+				 int scan_n, char *dest, int n)
 {
 	int i;
 	const char json_model[] = "{"
@@ -138,8 +169,10 @@ int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
 
 	int offset = 0;
 
-	if (NULL == scan_res || scan_size <= 0)
+	if (NULL == scan_res || scan_n <= 0)
 		return -1;
+
+	// TODO: do not use heap memory
 
 	// must be able to contain at least []\0
 	json = (char *)calloc(3, sizeof(char));
@@ -163,7 +196,7 @@ int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
 	*json = '[';
 	offset++;
 
-	for (i = 0; i <= scan_size; i++) {
+	for (i = 0; i <= scan_n; i++) {
 		// make sure bbsid is valid in the scan result array
 		if (strlen(scan_res[i].bssid)) {
 			memset(jsn_elm, '\0', jsn_elm_size);
@@ -177,7 +210,7 @@ int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
 			}
 
 			// Escape SSID
-			if (kinotto_wifi_sta_escape_ssid(
+			if (kinotto_json_wifi_sta_escape_ssid(
 				scan_res[i].ssid, strlen(scan_res[i].ssid),
 				escaped_ssid,
 				(KINOTTO_WIFI_STA_SSID_LEN * 2) + 1))
@@ -193,7 +226,7 @@ int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
 			// assembling,
 			// current json element, ] and \0
 			// FIXME: This strategy might cause memory fragmentation
-			// problems
+			// TODO: Do not use heap memory
 			char *json_tmp;
 			json_tmp = (char *)calloc(
 			    strlen(json) + strlen(jsn_elm) + 2, sizeof(char));
@@ -208,11 +241,11 @@ int kinotto_wifi_sta_scan_result_json(struct kinotto_wifi_sta_detail *scan_res,
 	json[offset++] = ']';
 	json[offset] = '\0';
 
-	if (buf_size < offset)
+	if (n < offset)
 		goto error;
 
-	memset(buf, '\0', buf_size);
-	strncpy(buf, json, offset);
+	memset(dest, '\0', n);
+	strncpy(dest, json, offset);
 
 	free(json);
 	free(jsn_elm);

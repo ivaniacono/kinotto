@@ -39,11 +39,11 @@ void kinotto_wifi_sta_destroy(kinotto_wifi_sta_t *kinotto_wifi_sta)
 }
 
 int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
-			      kinotto_wifi_sta_info_t *kinotto_wifi_sta_info)
+			      kinotto_wifi_sta_info_t *dest)
 {
 	if (kinotto_wpa_ctrl_wrapper_status(
 		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper,
-		kinotto_wifi_sta_info))
+		dest))
 		return -1;
 
 	return 0;
@@ -51,27 +51,27 @@ int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
 
 int kinotto_wifi_sta_connect_network(
     kinotto_wifi_sta_t *kinotto_wifi_sta,
-    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
-    kinotto_wifi_sta_connect_t *kinotto_wifi_sta_connect)
+    kinotto_wifi_sta_info_t *result,
+    kinotto_wifi_sta_connect_t *network_details)
 {
-	if (kinotto_wifi_sta_connect->timeout < 0)
+	if (network_details->timeout < 0)
 		return -1;
 
 	if (kinotto_wpa_ctrl_wrapper_connect_network(
 		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper,
-		kinotto_wifi_sta_connect, kinotto_wifi_sta_connect->remove_all))
+		network_details, network_details->remove_all))
 		goto error_wpa_ctrl_wrapper;
 
 	do {
 		if (kinotto_wpa_ctrl_wrapper_status(
 			kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper,
-			kinotto_wifi_sta_info))
+			result))
 			goto error_wpa_ctrl_wrapper;
 		sleep(1);
-	} while ((--kinotto_wifi_sta_connect->timeout) &&
-		 (kinotto_wifi_sta_info->state != KINOTTO_WIFI_STA_CONNECTED));
+	} while ((--network_details->timeout) &&
+		 (result->state != KINOTTO_WIFI_STA_CONNECTED));
 
-	if (kinotto_wifi_sta_info->state != KINOTTO_WIFI_STA_CONNECTED) {
+	if (result->state != KINOTTO_WIFI_STA_CONNECTED) {
 		kinotto_wpa_ctrl_wrapper_disconnect_network(
 		    kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper);
 		goto error_connect_timeout;
@@ -88,7 +88,7 @@ error_connect_timeout:
 
 int kinotto_wifi_sta_disconnect_network(
     kinotto_wifi_sta_t *kinotto_wifi_sta,
-    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info)
+    kinotto_wifi_sta_info_t *result)
 {
 	if (kinotto_wpa_ctrl_wrapper_disconnect_network(
 		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper))
@@ -96,7 +96,7 @@ int kinotto_wifi_sta_disconnect_network(
 
 	if (kinotto_wpa_ctrl_wrapper_status(
 		kinotto_wifi_sta->kinotto_wpa_ctrl_wrapper,
-		kinotto_wifi_sta_info))
+		result))
 		goto error_wpa_ctrl_wrapper;
 
 	return 0;

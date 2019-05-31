@@ -6,7 +6,7 @@ LDFLAGS += -lkinotto
 # Static
 # LDFLAGS += ../libkinotto.a
 
-CFLAGS += -Wall
+CFLAGS += -Wall -g
 
 C_FILES := $(wildcard *.c)
 OBJ_FILES := $(patsubst %.c, %.o,$(C_FILES))

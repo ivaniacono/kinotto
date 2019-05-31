@@ -54,7 +54,7 @@ kinotto_wifi_sta_t *kinotto_wifi_sta_init(const char *ifname);
  * kinotto_wifi_sta_destroy(kinotto_wifi_sta);
  * @endcode
  *
- * @param ifname wifi interface to use.
+ * @param kinotto_wifi_sta pointer to kinotto_wifi_sta_t object.
  */
 void kinotto_wifi_sta_destroy(kinotto_wifi_sta_t *kinotto_wifi_sta);
 
@@ -85,13 +85,13 @@ void kinotto_wifi_sta_destroy(kinotto_wifi_sta_t *kinotto_wifi_sta);
  * @endcode
  *
  * @param kinotto_wifi_sta pointer to a kinotto_wifi_sta object.
- * @param buf buffer where to copy result.
- * @param buf_size size of the result buffer.
+ * @param dest buffer where to copy result.
+ * @param n size of the dest buffer.
  * @return number of wifi networks found, -1 on error.
  */
 int kinotto_wifi_sta_scan_networks(kinotto_wifi_sta_t *kinotto_wifi_sta,
-				   struct kinotto_wifi_sta_detail *buf,
-				   int buf_size);
+				   struct kinotto_wifi_sta_detail *dest,
+				   int n);
 
 /**
  * @brief Get wifi station info.
@@ -113,11 +113,11 @@ int kinotto_wifi_sta_scan_networks(kinotto_wifi_sta_t *kinotto_wifi_sta,
  * @endcode
  *
  * @param kinotto_wifi_sta pointer to a kinotto_wifi_sta object.
- * @param kinotto_wifi_sta_info buffer where to copy result.
+ * @param dest buffer where to copy result.
  * @return 0 on success, -1 on error.
  */
 int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
-			      kinotto_wifi_sta_info_t *kinotto_wifi_sta_info);
+			      kinotto_wifi_sta_info_t *dest);
 
 /**
  * @brief Connect to a wifi network.
@@ -130,21 +130,21 @@ int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
  * @code
  * int rc = 0;
  * kinotto_wifi_sta_t *kinotto_wifi_sta;
- * kinotto_wifi_sta_info_t kinotto_wifi_sta_info;
- * kinotto_wifi_sta_connect_t kinotto_wifi_sta_connect;
+ * kinotto_wifi_sta_info_t result;
+ * kinotto_wifi_sta_connect_t network_details;
  *
  * kinotto_wifi_sta = kinotto_wifi_sta_init("wlan0");
  * if (!kinotto_wifi_sta)
  * 	return -1;
  *
- * memset(&kinotto_wifi_sta_connect, 0, sizeof(kinotto_wifi_sta_connect_t));
- * strncpy(kinotto_wifi_sta_connect.ssid, "your_ssid", KINOTTO_WIFI_STA_SSID_LEN);
- * strncpy(kinotto_wifi_sta_connect.psk, "your_psk_key", KINOTTO_WIFI_STA_PSK_LEN);
- * kinotto_wifi_sta_connect.timeout = WIFI_STA_CONNECT_TIMEOUT_S;
+ * memset(&network_details, 0, sizeof(kinotto_wifi_sta_connect_t));
+ * strncpy(network_details.ssid, "your_ssid", KINOTTO_WIFI_STA_SSID_LEN);
+ * strncpy(network_details.psk, "your_psk_key", KINOTTO_WIFI_STA_PSK_LEN);
+ * network_details.timeout = WIFI_STA_CONNECT_TIMEOUT_S;
  *
  * rc = kinotto_wifi_sta_connect_network(
- *  kinotto_wifi_sta, &kinotto_wifi_sta_info,
- *  &kinotto_wifi_sta_connect);
+ *  kinotto_wifi_sta, &result,
+ *  &network_details);
  *
  * if (rc) {
  * 	printf("failed\n");
@@ -156,15 +156,15 @@ int kinotto_wifi_sta_get_info(kinotto_wifi_sta_t *kinotto_wifi_sta,
  * @endcode
  *
  * @param kinotto_wifi_sta pointer to a kinotto_wifi_sta_t object.
- * @param kinotto_wifi_sta_info buffer where to copy the result.
- * @param kinotto_wifi_sta_connect pointer to a kinotto_wifi_sta_connect_t
+ * @param result buffer where to copy the result.
+ * @param network_details pointer to a kinotto_wifi_sta_connect_t
  *  containig connection parameters.
  * @return 0 on success, -1 on error.
  */
 int kinotto_wifi_sta_connect_network(
     kinotto_wifi_sta_t *kinotto_wifi_sta,
-    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info,
-    kinotto_wifi_sta_connect_t *kinotto_wifi_sta_connect);
+    kinotto_wifi_sta_info_t *result,
+    kinotto_wifi_sta_connect_t *network_details);
 
 /**
  * @brief Disconnect from a wifi network.
@@ -199,7 +199,7 @@ int kinotto_wifi_sta_connect_network(
  */
 int kinotto_wifi_sta_disconnect_network(
     kinotto_wifi_sta_t *kinotto_wifi_sta,
-    kinotto_wifi_sta_info_t *kinotto_wifi_sta_info);
+    kinotto_wifi_sta_info_t *result);
 
 /**
  * @brief Save wifi station network information.

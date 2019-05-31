@@ -7,7 +7,8 @@ CFLAGS += \
 	-std=c99 \
 	-Iinclude/ -I$(WPA_SUPPLICANT) \
 	-DDHCLIENT \
-	-fPIC -Wall
+	-fPIC -Wall \
+	-g
 
 WPA_CFLAGS += \
 	-I$(WPA_SUPPLICANT) \
